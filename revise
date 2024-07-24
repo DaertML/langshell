@@ -1,0 +1,31 @@
+#!/usr/bin/python3
+import json
+import requests
+
+import sys
+
+urlllm = "http://localhost:8080/completion"
+
+def llamacpp_generate(urlllm, prompt, temp=0.6):
+    headers = {"Content-Type": "application/json"}
+    data = {"prompt": prompt, "temperature": temp}
+    data = json.dumps(data)
+    res = requests.post(url=urlllm, data=data, headers=headers)
+    return res.json()["content"]
+
+input = ""
+for line in sys.stdin:
+    input += line
+
+print("FOUND CONTEXT")
+print(input)
+print("============================================")
+
+prompt = open("./prompts/revise.txt", "r").read()
+prompt = prompt.replace("{CONTEXT}", input)
+
+gen = llamacpp_generate(urlllm, prompt)
+
+print("****************************************")
+
+sys.stdout.write(gen)
